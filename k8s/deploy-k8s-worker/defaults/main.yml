@@ -1,0 +1,10 @@
+---
+# roles/k8s-worker/defaults/main.yml
+kubernetes_version: "1.29"
+k8s_join_command_file: "/tmp/k8s-join-command"
+k8s_join_command_local: "./k8s-join-command"
+
+# Join timeout settings
+join_command_wait_timeout: 300
+join_retry_count: 3
+join_retry_delay: 10

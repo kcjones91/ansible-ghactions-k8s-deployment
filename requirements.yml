@@ -1,0 +1,5 @@
+---
+# requirements.yml - Install required Ansible collections
+collections:
+  - name: ansible.posix
+  - name: community.general

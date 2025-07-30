@@ -1,0 +1,13 @@
+---
+# site.yml - Main playbook to deploy Kubernetes cluster
+- name: Deploy Kubernetes Master Node
+  hosts: master
+  become: yes
+  roles:
+    - k8s-master
+    
+- name: Deploy Kubernetes Worker Nodes
+  hosts: workers
+  become: yes
+  roles:
+    - k8s-worker

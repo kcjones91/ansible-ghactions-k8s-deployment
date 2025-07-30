@@ -1,0 +1,12 @@
+---
+# roles/k8s-master/defaults/main.yml
+kubernetes_version: "1.29"
+pod_network_cidr: "10.244.0.0/16"
+k8s_join_command_file: "/tmp/k8s-join-command"
+k8s_join_command_local: "./k8s-join-command"
+
+# Service restart timeout
+service_timeout: 60
+
+# API server wait timeout  
+api_wait_timeout: 300
