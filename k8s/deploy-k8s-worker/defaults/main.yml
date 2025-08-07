@@ -1,10 +1,55 @@
 ---
-# roles/k8s-worker/defaults/main.yml
-kubernetes_version: "1.29"
+# roles/k8s-worker/defaults/main.yml - Fedora Official Docs Configuration
+kubernetes_version: "1.31"
+kubernetes_package: "kubernetes1.32"  # For Fedora 41+ versioned packages
+container_runtime: "crio"  # Following Fedora docs recommendation
 k8s_join_command_file: "/tmp/k8s-join-command"
 k8s_join_command_local: "./k8s-join-command"
 
-# Join timeout settings
+# Firewall ports for worker nodes
+worker_firewall_ports:
+  - "10250/tcp"       # Kubelet API
+  - "10248/tcp"       # Kubelet health check port
+  - "10256/tcp"       # kube-proxy metrics
+  - "8472/udp"        # Flannel VXLAN
+  - "8285/udp"        # Flannel host-gw backend
+  - "80/tcp"          # HTTP services
+  - "443/tcp"         # HTTPS services
+  - "30000-32767/tcp" # NodePort Services TCP
+  - "30000-32767/udp" # NodePort Services UDP
+
+# Container runtime packages (Fedora docs step 1)
+container_runtime_packages:
+  - cri-o
+  - containernetworking-plugins
+
+# Kubernetes packages for workers (Fedora docs step 2)
+kubernetes_packages:
+  - "{{ kubernetes_package }}"
+  - "{{ kubernetes_package }}-kubeadm"
+
+# Runtime dependencies
+runtime_dependencies:
+  - crun
+  - runc
+
+# Join command timeout settings
 join_command_wait_timeout: 300
 join_retry_count: 3
 join_retry_delay: 10
+
+# Firewall configuration (keeping firewall active)
+enable_firewall: true
+firewall_zone: "FedoraServer"
+
+# SELinux configuration (permissive as recommended by Fedora docs)
+selinux_state: "permissive"
+
+# Swap configuration (Fedora uses zram)
+disable_zram: true
+remove_zram_generator: true
+
+# Node readiness timeout
+node_ready_timeout: 300
+node_ready_retries: 30
+node_ready_delay: 10

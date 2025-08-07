@@ -1,12 +1,59 @@
 ---
-# roles/k8s-master/defaults/main.yml
-kubernetes_version: "1.29"
+# roles/k8s-master/defaults/main.yml - Fedora Official Docs Configuration
+kubernetes_version: "1.31"
+kubernetes_package: "kubernetes1.32"  # For Fedora 41+ versioned packages
+container_runtime: "crio"  # Following Fedora docs recommendation
 pod_network_cidr: "10.244.0.0/16"
 k8s_join_command_file: "/tmp/k8s-join-command"
 k8s_join_command_local: "./k8s-join-command"
 
-# Service restart timeout
-service_timeout: 60
+# Firewall ports for master node
+master_firewall_ports:
+  - "6443/tcp"      # Kubernetes API server
+  - "8443/tcp"      # Alternative API server port
+  - "2379-2380/tcp" # etcd server client API  
+  - "10250/tcp"     # Kubelet API
+  - "10248/tcp"     # Kubelet health check port
+  - "10259/tcp"     # kube-scheduler
+  - "10257/tcp"     # kube-controller-manager
+  - "8472/udp"      # Flannel VXLAN
+  - "8285/udp"      # Flannel host-gw backend
+  - "80/tcp"        # HTTP ingress
+  - "443/tcp"       # HTTPS ingress
+  - "30000-32767/tcp" # NodePort range TCP
+  - "30000-32767/udp" # NodePort range UDP
 
-# API server wait timeout  
+# Container runtime packages (Fedora docs step 1)
+container_runtime_packages:
+  - cri-o
+  - containernetworking-plugins
+
+# Kubernetes packages (Fedora docs step 2)
+kubernetes_packages:
+  - "{{ kubernetes_package }}"
+  - "{{ kubernetes_package }}-kubeadm"
+  - "{{ kubernetes_package }}-client"
+
+# Runtime dependencies
+runtime_dependencies:
+  - crun
+  - runc
+
+# CNI Plugin (Flannel as per Fedora docs)
+cni_plugin: "flannel"
+flannel_manifest_url: "https://github.com/coreos/flannel/raw/master/Documentation/kube-flannel.yml"
+
+# Firewall configuration (keeping firewall active)
+enable_firewall: true
+firewall_zone: "FedoraServer"
+
+# Service timeouts
+service_timeout: 60
 api_wait_timeout: 300
+
+# SELinux configuration (permissive as recommended by Fedora docs)
+selinux_state: "permissive"
+
+# Swap configuration (Fedora uses zram)
+disable_zram: true
+remove_zram_generator: true
