@@ -4,10 +4,14 @@
   hosts: master
   become: yes
   roles:
-    - k8s-master
+    - deploy-k8s-master
+  tags: 
+  - masters
     
 - name: Deploy Kubernetes Worker Nodes
   hosts: workers
   become: yes
   roles:
-    - k8s-worker
+    - deploy-k8s-worker
+  tags:
+  - workers
